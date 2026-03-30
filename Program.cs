@@ -1,6 +1,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using RBAC_API_project.Data;
+using RBAC_API_project.Repository;
+using RBAC_API_project.Services;
 
 namespace RBAC_API_project
 {
@@ -12,16 +14,15 @@ namespace RBAC_API_project
 
             //// Add Data and Models
             builder.Services.AddDbContext<UserDb>(options =>
-                options.UseNpgsql( builder.Configuration.GetConnectionString("DefaultConnection") )
-                
+                options.UseNpgsql( builder.Configuration.GetConnectionString("DefaultConnection") )                
                 );
-            
+
+
             /// Add repository
-
-
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
 
             // Add services 
-
+            builder.Services.AddScoped<IUserService,UserService>();
 
             // Add Controllers
             builder.Services.AddControllers();
