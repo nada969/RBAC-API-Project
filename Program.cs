@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using RBAC_API_project.Data;
 using RBAC_API_project.Repository;
@@ -34,6 +35,14 @@ namespace RBAC_API_project
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Add Police
+            builder.Services.AddCors(corsOptions =>
+                corsOptions.AddPolicy("MyPolice", CorsPolicyBuilder =>
+                {
+                    //CorsPolicyBuilder.WithOrigins("")  // for spacific domain(like: www.google.com, ...)
+                    CorsPolicyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                })
+            );
 
             var app = builder.Build();
 
@@ -43,6 +52,11 @@ namespace RBAC_API_project
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseStaticFiles();   /// html , images, ...
+
+            // SETTING CORS POLICE
+            app.UseCors("MyPolice");  /// TO ENABLE API OPEN IN EXTERNAL HTML PAGES
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

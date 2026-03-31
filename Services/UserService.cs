@@ -20,13 +20,17 @@ namespace RBAC_API_project.Services
         {
             return await _userRepo.UserExistAsync(Email);
         }
-        public async Task<User?> LoginAsync(string Email,string Password)
+        public async Task<User?> LoginAsync(string Email, string Password)
         {
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+                return null;
+
             User? user = await _userRepo.GetByEmailAsync(Email);
-            if (user == null)  return null;
+            if (user == null)
+                return null;
+
             bool IsValid = BCrypt.Net.BCrypt.Verify(Password, user.Password);
             return IsValid ? user : null;
-            
         }
         public async Task<User> RegisterAsyn(string Name, string Email, string Password)
         {

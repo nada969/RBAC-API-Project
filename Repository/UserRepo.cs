@@ -19,7 +19,7 @@ namespace RBAC_API_project.Repository
         }
         public async Task<bool> UserExistAsync(string Email)
         {
-            return await _userDb.Users.AnyAsync(u => u.Email == Email);
+            return await _userDb.Users.AnyAsync(u => u.Email.ToLower() == Email.ToLower());
         }
         public async Task<User> RegisterAsyn(string Name, string Email, string Password)
         {
@@ -34,13 +34,11 @@ namespace RBAC_API_project.Repository
             return new_user;
         }
 
-        
+
         public async Task<User?> GetByEmailAsync(string Email)
         {
             return await _userDb.Users
-                .Include(u => u.UserRoles)
-                    .ThenInclude(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Email == Email);
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == Email.ToLower());
         }
 
     }
