@@ -6,8 +6,8 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public virtual ICollection<UserRole>? UserRoles { get; set; }
-
+        //public virtual ICollection<UserRole>? UserRoles { get; set; }
+        public User() { }
         public User(string Name, string Email, string Password)
         {
             this.Name = Name;

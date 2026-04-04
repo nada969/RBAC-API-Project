@@ -1,4 +1,5 @@
-﻿using RBAC_API_project.Models;
+﻿using RBAC_API_project.Data;
+using RBAC_API_project.Models;
 using RBAC_API_project.Repository;
 
 namespace RBAC_API_project.Services
@@ -8,6 +9,7 @@ namespace RBAC_API_project.Services
         Task<bool> UserExistAsync(string Email);
         Task<User?> LoginAsync(string Email, string Password);
         Task<User> RegisterAsyn(string Name, string Email, string Password);
+
     }
     public class UserService: IUserService
     {
@@ -16,15 +18,14 @@ namespace RBAC_API_project.Services
         {
             _userRepo = userRepo;
         }
+      
         public async Task<bool> UserExistAsync(string Email)
         {
             return await _userRepo.UserExistAsync(Email);
         }
         public async Task<User?> LoginAsync(string Email, string Password)
         {
-            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-                return null;
-
+           
             User? user = await _userRepo.GetByEmailAsync(Email);
             if (user == null)
                 return null;

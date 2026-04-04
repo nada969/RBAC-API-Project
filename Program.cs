@@ -1,9 +1,13 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RBAC_API_project.Data;
 using RBAC_API_project.Repository;
 using RBAC_API_project.Services;
+using System.Configuration;
+using System.Text;
 
 namespace RBAC_API_project
 {
@@ -13,10 +17,35 @@ namespace RBAC_API_project
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            //// Add Data and Models
+            ////      Add Data and Models
             builder.Services.AddDbContext<UserDb>(options =>
-                options.UseNpgsql( builder.Configuration.GetConnectionString("DefaultConnection") )                
+                options.UseNpgsql( builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."))                
                 );
+            ////      Add jwt
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer( o => {
+                    o.RequireHttpsMetadata = false;
+                    o.SaveToken = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime=true,
+                        ValidAudience = builder.Configuration["JWT:Audience"],
+                        ValidIssuer = builder.Configuration["JWT:Is9suer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+
+                    };
+
+
+                })
+                
+                ;
 
 
             /// Add repository
@@ -24,6 +53,9 @@ namespace RBAC_API_project
 
             // Add services 
             builder.Services.AddScoped<IUserService,UserService>();
+
+            // JWT
+            builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
             // Add Controllers
             builder.Services.AddControllers();
@@ -59,6 +91,7 @@ namespace RBAC_API_project
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
