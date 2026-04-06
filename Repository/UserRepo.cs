@@ -26,7 +26,7 @@ namespace RBAC_API_project.Repository
         public async Task<User> RegisterAsyn(string Name, string Email, string Password)
         {
             /// 1.create new user
-            User new_user = new User(Name, Email, Password) ;
+            User new_user = new User() ;
             /// 2.save to DB
             await _userDb.Users.AddAsync(new_user);
             await _userDb.SaveChangesAsync();

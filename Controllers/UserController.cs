@@ -12,7 +12,11 @@ namespace RBAC_API_project.Controllers
     //[Authorize(AuthenticationSchemes ="Bearer")]
     [Route("api/[controller]")]
     [ApiController]
-    public record RegisterRequest(string Name, string Email, string Password);
+    public class RegisterRequest() {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
     public record LoginRequest(string Email, string Password);
 
    
@@ -33,12 +37,12 @@ namespace RBAC_API_project.Controllers
                 return BadRequest("Email is already here");
             }
             User new_user = await _userService.RegisterAsyn(request.Name, request.Email, request.Password);
-            return Ok(new { new_user.Id, new_user.Name, new_user.Email });
+            return Ok(new_user);
 
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromRoute] LoginRequest loginRequest)
         {
             if (string.IsNullOrWhiteSpace(loginRequest.Email) || string.IsNullOrWhiteSpace(loginRequest.Password))
                 return BadRequest("Email and password are required");
